@@ -27,6 +27,7 @@ from dotenv import load_dotenv
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 
 # Set logging config
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -36,7 +37,7 @@ logging.disable(logging.CRITICAL) # Disable logging
 load_dotenv(path.join(path.dirname(__file__), '.env'))
 SENDER_EMAIL = environ.get('SENDER_EMAIL')
 SENDER_PASSWORD = environ.get('SENDER_PASSWORD')
-RECEIVER_EMAILS = environ.get('RECEIVER_EMAILS').split(',')
+RECEIVER_EMAILS = environ.get('RECEIVER_EMAILS')
 
 hasAnimeUpdated = False     # A flag whether there is an anime update during this one-time check
 
@@ -60,22 +61,47 @@ def add_header(message, header_name, header_value):
     return message
 
 # Send email to myself
-def sendEmailToMyself(subject, content):
+def sendEmailToMyself(subject, content, hasImage=False, url='', index='0'):
+    global animes
     smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
     smtpObj.ehlo()
     smtpObj.starttls()
     smtpObj.login(SENDER_EMAIL, SENDER_PASSWORD)
 
-    # Generate email message string
-    msg = MIMEMultipart('alternative')
-    msg = add_header(msg, 'Subject', subject)
-    if(contains_non_ascii_characters(content)):
-        plain_text = MIMEText(content.encode('utf-8'),'plain','utf-8') 
-    else:
-        plain_text = MIMEText(content,'plain')
-    msg.attach(plain_text)
+    msgRoot = MIMEMultipart('related')
+    msgRoot['Subject'] = subject
+    msgRoot['From'] = SENDER_EMAIL
+    msgRoot['To'] = RECEIVER_EMAILS
+    
+    msgAlternative = MIMEMultipart('alternative')
+    msgRoot.attach(msgAlternative)
 
-    smtpObj.sendmail(SENDER_EMAIL, RECEIVER_EMAILS, str(msg))
+    # Add content
+    content = content + "<a href='" + url + "'><img src='cid:image" + index + "'></a><br/><br/>===============================<br/>目前追蹤清單：<br/><br/>-------- 動畫 --------<br/>"
+    for anime in animes['animes']:
+        if anime['finished']:
+            status = '已完結'
+        else:
+            status = '連載中'
+        content = content + '<a href="' + anime['url'] + '">[' + status + '] ' + anime['title'] + '【' + str(anime['episode']) + '】</a><br/>'
+    content = content + "<br/>-------- 漫畫 --------<br/>"
+    for comic in animes['comics']:
+        if comic['finished']:
+            status = '已完結'
+        else:
+            status = '連載中'
+        content = content + '<a href="' + comic['url'] + '">[' + status + '] ' + comic['title'] + '【' + str(comic['episode']) + '】</a><br/>'
+
+    msgAlternative.attach(MIMEText(content.encode('utf-8'), 'html', 'utf-8'))
+
+    # Add image
+    if hasImage:
+        with open(path.join(path.dirname(__file__), 'image.jpg'), 'rb') as fp:
+            msgImage = MIMEImage(fp.read())
+        msgImage.add_header('Content-ID', '<image' + index + '>')
+        msgRoot.attach(msgImage)
+
+    smtpObj.send_message(msgRoot)
     smtpObj.quit()
     print('Email sent')
 
@@ -106,17 +132,42 @@ def checkMyselfBBS(anime, index):
         return
     episodeNum = int(episodeNumText.group(0))
     logging.info('Found episode ' + str(episodeNum))
+    episodeStatus = re.search('【全', episodeElems[0].getText())
+    if episodeStatus != None:
+        hasEnded = True
+        logging.info('已完結')
+    else:
+        hasEnded = False
+        logging.info('連載中')
 
     # Check whether the anime has been updated.
     if episodeNum > episode:
         print('[動畫] ' + title + ' 更新了第 ' + str(episodeNum) + ' 集了！')
-        # Update episode num
-        animes['animes'][index]['episode'] = episodeNum
+        # Update episode status
         hasAnimeUpdated = True
+        animes['animes'][index]['episode'] = episodeNum
+        if hasEnded:
+            print('[動畫] ' + title + ' 已完結！！！')
+            animes['animes'][index]['finished'] = True
+        # Download anime image for email
+        imgElem = soup.select('.info_img_box img')
+        if imgElem == []:
+            logging.warning('Could not find image elem')
+            hasImage = False
+        else:
+            imgUrl = imgElem[0].get('src')
+            res = requests.get(imgUrl)
+            imageFile = open(path.join(path.dirname(__file__), 'image.jpg'), 'wb')
+            for chunk in res.iter_content(100000):
+                imageFile.write(chunk)
+            imageFile.close()
+            hasImage = True
+
+
         # Email me
         subject = '追劇神：[動畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！'
-        content = '[動畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！\n戳我觀看：' + url
-        sendEmailToMyself(subject, content)
+        content = '[動畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！<br/><br/>戳我觀看：' + url + '<br/><br/>'
+        sendEmailToMyself(subject, content, hasImage, url, str(index))
         # TODO: Download episode video for me
 
 
@@ -159,7 +210,7 @@ def checkCartoonMad(comic, index):
         # Email me
         subject = '追劇神：[漫畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！'
         content = '[漫畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！\n戳我觀看：' + url
-        sendEmailToMyself(subject, content)
+        sendEmailToMyself(subject, content, False)
         # TODO: Download this comic for me
 
 
