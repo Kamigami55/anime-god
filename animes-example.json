@@ -12,5 +12,19 @@
             "site": "myself-bbs",
             "title": "在地下城尋求邂逅是否搞錯了什麼 劍姬神聖譚"
         }
+    ],
+    "comics": [
+        {
+            "episode": 142,
+            "title": "我的英雄學院",
+            "url": "http://www.cartoonmad.com/comic/4085.html",
+            "site": "cartoonmad"
+        },
+        {
+            "episode": 49,
+            "title": "亞人",
+            "url": "http://www.cartoonmad.com/comic/3572.html",
+            "site": "cartoonmad"
+        }
     ]
 }

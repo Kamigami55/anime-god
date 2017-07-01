@@ -81,9 +81,12 @@ def sendEmailToMyself(subject, content):
 
 
 # Check animes on Myself-bbs
-def checkMyselfBBS(title, url, episode, index):
+def checkMyselfBBS(anime, index):
     global animes
     global hasAnimeUpdated
+    title = anime['title']
+    url = anime['url']
+    episode = anime['episode']
 
     # Download page
     logging.info('Checking [Myself-bbs] ' + title + '[' + str(episode) + '] : ' + url)
@@ -106,22 +109,72 @@ def checkMyselfBBS(title, url, episode, index):
 
     # Check whether the anime has been updated.
     if episodeNum > episode:
-        print(title + ' 更新了第 ' + str(episodeNum) + ' 集了！')
+        print('[動畫] ' + title + ' 更新了第 ' + str(episodeNum) + ' 集了！')
         # Update episode num
         animes['animes'][index]['episode'] = episodeNum
         hasAnimeUpdated = True
         # Email me
-        subject = '追劇神：' + title + ' 更新了第【' + str(episodeNum) + '】集！'
-        content = title + ' 更新了第【' + str(episodeNum) + '】集！\n戳我觀看：' + url
+        subject = '追劇神：[動畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！'
+        content = '[動畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！\n戳我觀看：' + url
         sendEmailToMyself(subject, content)
         # TODO: Download episode video for me
+
+
+# Check comics on CartoonMad
+def checkCartoonMad(comic, index):
+    global animes
+    global hasAnimeUpdated
+    title = comic['title']
+    url = comic['url']
+    episode = comic['episode']
+
+    # Download page
+    logging.info('Checking [CartoonMad] ' + title + '[' + str(episode) + '] : ' + url)
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = bs4.BeautifulSoup(res.text, 'html.parser')
+    
+    # Get episode number from page
+    # Only works for serializing comics
+    # TODO: Fix it
+    episodeElemImg = soup.find("img", src='/image/chap1.gif')
+    if episodeElemImg == None:
+        logging.warning('Could not find episode element img')
+        return
+    rx_blanks=re.compile(r"\s+")
+    episodeNumText = rx_blanks.sub("", episodeElemImg.parent.contents[2].getText())
+    episodeNumMatch = re.search('~(\d+)', episodeNumText)
+    if episodeNumMatch == None:
+        logging.warning('Could not find episodeNumText')
+        return
+    episodeNum = int(episodeNumMatch.group(1))
+    logging.info('Found episode ' + str(episodeNum))
+
+    # Check whether the anime has been updated.
+    if episodeNum > episode:
+        print('[漫畫] ' + title + ' 更新了第 ' + str(episodeNum) + ' 集了！')
+        # Update episode num
+        animes['comics'][index]['episode'] = episodeNum
+        hasAnimeUpdated = True
+        # Email me
+        subject = '追劇神：[漫畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！'
+        content = '[漫畫] ' + title + ' 更新了第【' + str(episodeNum) + '】集！\n戳我觀看：' + url
+        sendEmailToMyself(subject, content)
+        # TODO: Download this comic for me
+
 
 
 # Loop through each anime in my animes list
 for i in range(len(animes['animes'])):
     anime = animes['animes'][i]
     if anime['site'] == 'myself-bbs':
-        checkMyselfBBS(anime['title'], anime['url'], anime['episode'], i)
+        checkMyselfBBS(anime, i)
+
+# Loop through each comic in my comics list
+for i in range(len(animes['comics'])):
+    comic = animes['comics'][i]
+    if comic['site'] == 'cartoonmad':
+        checkCartoonMad(comic, i)
 
 
 # If there is an anime update, then update episode numbers to ./animes.json
