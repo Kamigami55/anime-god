@@ -36,7 +36,7 @@ logging.disable(logging.CRITICAL) # Disable logging
 load_dotenv(path.join(path.dirname(__file__), '.env'))
 SENDER_EMAIL = environ.get('SENDER_EMAIL')
 SENDER_PASSWORD = environ.get('SENDER_PASSWORD')
-RECEIVER_EMAIL = environ.get('RECEIVER_EMAIL')
+RECEIVER_EMAILS = environ.get('RECEIVER_EMAILS').split(',')
 
 hasAnimeUpdated = False     # A flag whether there is an anime update during this one-time check
 
@@ -75,7 +75,7 @@ def sendEmailToMyself(subject, content):
         plain_text = MIMEText(content,'plain')
     msg.attach(plain_text)
 
-    smtpObj.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, str(msg))
+    smtpObj.sendmail(SENDER_EMAIL, RECEIVER_EMAILS, str(msg))
     smtpObj.quit()
     print('Email sent')
 
