@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!./venv/bin/python
 # coding: utf8
 
 ###########################################################
@@ -31,7 +31,7 @@ from email.mime.image import MIMEImage
 
 # Set logging config
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
-logging.disable(logging.CRITICAL) # Disable logging
+#logging.disable(logging.CRITICAL) # Disable logging
 
 # Load my email addresses and password from ./.env
 load_dotenv(path.join(path.dirname(__file__), '.env'))
@@ -126,11 +126,11 @@ def checkMyselfBBS(anime, index):
         logging.warning('Could not find episode elements')
         return
     logging.info(episodeElems[0].getText())
-    episodeNumText = re.search('\d+', episodeElems[0].getText())
+    episodeNumText = re.search('【更新至第 (\d+)', episodeElems[0].getText())
     if episodeNumText == None:
         logging.warning('Could not find episodeNumText')
         return
-    episodeNum = int(episodeNumText.group(0))
+    episodeNum = int(episodeNumText.group(1))
     logging.info('Found episode ' + str(episodeNum))
     episodeStatus = re.search('【全', episodeElems[0].getText())
     if episodeStatus != None:
