@@ -16,6 +16,7 @@ def createTable():
         WATCH_URL   CHAR(150)           ,
         IMG_URL     CHAR(150)           ,
         IMG_SRC     CHAR(150)           ,
+        SUBSCRIBE   BOOLEAN             ,
         ENDED       BOOLEAN 
         );''')
     conn.execute('''CREATE TABLE COMIC (
@@ -27,6 +28,7 @@ def createTable():
         WATCH_URL   CHAR(150)           ,
         IMG_URL     CHAR(150)           ,
         IMG_SRC     CHAR(150)           ,
+        SUBSCRIBE   BOOLEAN             ,
         ENDED       BOOLEAN             
         );''')
     conn.close()
@@ -39,9 +41,9 @@ def importAnigamer():
 
     for anime in animes:
         conn.execute('''INSERT INTO ANIME
-        (NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, ENDED) VALUES
-        ('%s', %d, '%s', '%s', '%s', '%s', '%s', %d)
-        ''' % (anime['name'], anime['volume'], 'anigamer', 'https://ani.gamer.com.tw/', anime['watchUrl'], anime['imageUrl'], anime['imageSrc'], 0))
+        (NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED) VALUES
+        ('%s', %d, '%s', '%s', '%s', '%s', '%s', %d, %d)
+        ''' % (anime['name'], anime['volume'], 'anigamer', 'https://ani.gamer.com.tw/', anime['watchUrl'], anime['imageUrl'], anime['imageSrc'], 1, 0))
 
     conn.commit()
     conn.close()
@@ -54,9 +56,9 @@ def importMyselfbbs():
 
     for anime in animes:
         conn.execute('''INSERT INTO ANIME
-        (NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, ENDED) VALUES
-        ('%s', %d, '%s', '%s', '%s', '%s', '%s', %d)
-        ''' % (anime['name'], anime['volume'], 'myselfbbs', anime['listUrl'], anime['watchUrl'], anime['imageUrl'], anime['imageSrc'], 0))
+        (NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED) VALUES
+        ('%s', %d, '%s', '%s', '%s', '%s', '%s', %d, %d)
+        ''' % (anime['name'], anime['volume'], 'myselfbbs', anime['listUrl'], anime['watchUrl'], anime['imageUrl'], anime['imageSrc'], 1, 0))
 
     conn.commit()
     conn.close()

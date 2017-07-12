@@ -5,7 +5,7 @@ DB = os.path.join(os.path.dirname(__file__), 'data.db')
 
 def loadAnimes():
     conn = sqlite3.connect(DB)
-    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, ENDED FROM ANIME')
+    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM ANIME')
     animes = []
     for row in cursor:
         id = row[0]
@@ -16,7 +16,8 @@ def loadAnimes():
         watchUrl = row[5]
         imgUrl = row[6]
         imgSrc = row[7]
-        ended = row[8]
+        subscribe = row[8]
+        ended = row[9]
         animes.append({
             'id': id,
             'name': name,
@@ -26,6 +27,7 @@ def loadAnimes():
             'watchUrl': watchUrl,
             'imgUrl': imgUrl,
             'imgSrc': imgSrc,
+            'subscribe': subscribe,
             'ended': ended
             })
     conn.close()
@@ -34,7 +36,7 @@ def loadAnimes():
 
 def loadComics():
     conn = sqlite3.connect(DB)
-    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, ENDED FROM COMIC')
+    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM COMIC')
     comics = []
     for row in cursor:
         id = row[0]
@@ -45,7 +47,8 @@ def loadComics():
         watchUrl = row[5]
         imgUrl = row[6]
         imgSrc = row[7]
-        ended = row[8]
+        subscribe = row[8]
+        ended = row[9]
         comics.append({
             'id': id,
             'name': name,
@@ -55,6 +58,7 @@ def loadComics():
             'watchUrl': watchUrl,
             'imgUrl': imgUrl,
             'imgSrc': imgSrc,
+            'subscribe': subscribe,
             'ended': ended
             })
     conn.close()
@@ -74,6 +78,7 @@ def printTable():
         print('watchUrl: ' + anime['watchUrl'])
         print('imgUrl: ' + anime['imgUrl'])
         print('imgSrc: ' + anime['imgSrc'])
+        print('subscribe: ' + str(anime['subscribe']))
         print('ended: ' + str(anime['ended']))
         print('========================')
     print('Anime count: ' + str(len(animes)))
@@ -88,6 +93,7 @@ def printTable():
         print('watchUrl: ' + comic['watchUrl'])
         print('imgUrl: ' + comic['imgUrl'])
         print('imgSrc: ' + comic['imgSrc'])
+        print('subscribe: ' + str(anime['subscribe']))
         print('ended: ' + str(comic['ended']))
         print('========================')
     print('Comic count: ' + str(len(comics)))
