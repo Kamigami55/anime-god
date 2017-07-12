@@ -28,7 +28,7 @@ def add_header(message, header_name, header_value):
     return message
 
 
-def sendEmailWithOneImage(subject, content, imgSource):
+def sendEmailWithOneImage(subject, content, imgSource, imgIdx):
 
     msgRoot = MIMEMultipart('related')
     msgRoot['Subject'] = subject
@@ -43,7 +43,7 @@ def sendEmailWithOneImage(subject, content, imgSource):
     # Attach image
     fp = open(imgSource, 'rb')
     msgImage = MIMEImage(fp.read())
-    msgImage.add_header('Content-ID', '<image%s>' % (path.basename(imgSource)))
+    msgImage.add_header('Content-ID', '<image%d>' % (imgIdx))
     msgRoot.attach(msgImage)
 
     smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
@@ -91,7 +91,7 @@ def generateSubject(elem):
 
 def generateContent(elem, animes, comics):
     content = '%s 更新了第【%d】集了！<br/><br/>戳我觀看：%s' % (elem['name'], elem['volume'], elem['watchUrl'])
-    content += '<br/><br/><a href="%s"><img src="cid:image%s"></a>' % (elem['watchUrl'], path.basename(elem['imgSrc']))
+    content += '<br/><br/><a href="%s"><img src="cid:image%d"></a>' % (elem['watchUrl'], elem['id'])
     content += generateSubList(animes, comics)
     return content
 
@@ -100,6 +100,6 @@ def generateContent(elem, animes, comics):
 def sendEmail(elem, animes, comics):
     subject = generateSubject(elem)
     content = generateContent(elem, animes, comics)
-    sendEmailWithOneImage(subject, content, elem['imgSrc'])
+    sendEmailWithOneImage(subject, content, elem['imgSrc'], elem['id'])
     print('Email sent')
 
