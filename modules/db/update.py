@@ -10,8 +10,8 @@ COMIC_TABLE_NAME = 'SUBS_COMIC'
 
 def update(anime):
     conn = sqlite3.connect(DB)
-    conn.execute('UPDATE %s set VOLUME=? WHERE ID=?', (ANIME_TABLE_NAME, anime['volume'], anime['id']))
-    conn.execute('UPDATE %s set WATCH_URL=? WHERE ID=?', (ANIME_TABLE_NAME, anime['watchUrl'], anime['id']))
+    conn.execute('UPDATE %s set VOLUME=%d WHERE ID=%d' % (ANIME_TABLE_NAME, anime['volume'], anime['id']))
+    conn.execute('UPDATE %s set WATCH_URL="%s" WHERE ID=%d' % (ANIME_TABLE_NAME, anime['watchUrl'], anime['id']))
     conn.commit()
     conn.close()
     print('Updated anime %s[%d]: %s' % (anime['name'], anime['volume'], anime['watchUrl']))
