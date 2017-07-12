@@ -80,6 +80,14 @@ def fetchAll():
 
     return animes
 
+SRC_CLOUD = 0
+SRC_BILI = 1
+SRC_DM = 2
+SRC_YOUKU = 3
+SRC_IQUYI = 4
+SRC_BACKUP = 5
+SRC_HOONE = 6
+SRC_NONE = 10
 
 def fetch(anime):
     # Get page
@@ -94,14 +102,43 @@ def fetch(anime):
         print('Something wrong when fetch myselfbbs anime %s' % anime['name'])
         volume = 0
     if volume > anime['volume']:
+        # 篩選最好的片源點
         sourceElems = volumeElem.select('ul a')
+        bestSrc = SRC_NONE # 沒有對應到任何片源點
+        bestWatchUrl = ''
+
         for sourceElem in sourceElems:
-            if sourceElem.getText() == '雲端':
-                fetchAnime = deepcopy(anime)
-                fetchAnime['watchUrl'] = sourceElem.get('data-href')
-                fetchAnime['volume'] = volume
-                return fetchAnime
-    return anime
+            source = sourceElem.getText()
+            if source == '雲端':
+                bestSrc = SRC_CLOUD
+                bestWatchUrl = sourceElem.get('data-href')
+                break
+            elif source == 'B站' and bestSrc > SRC_BILI:
+                bestSrc = SRC_BILI
+                bestWatchUrl = sourceElem.get('data-href')
+            elif source == 'DM' and bestSrc > SRC_DM:
+                bestSrc = SRC_DM
+                bestWatchUrl = sourceElem.get('data-href')
+            elif source == '優酷' and bestSrc > SRC_YOUKU:
+                bestSrc = SRC_YOUKU
+                bestWatchUrl = sourceElem.get('data-href')
+            elif source == '愛奇' and bestSrc > SRC_IQUYI:
+                bestSrc = SRC_IQUYI
+                bestWatchUrl = anime['listUrl']
+            elif source == '備點' and bestSrc > SRC_BACKUP:
+                bestSrc = SRC_BACKUP
+                bestWatchUrl = anime['listUrl']
+            elif source == '合壹' and bestSrc > SRC_HOONE:
+                bestSrc = SRC_HOONE
+                bestWatchUrl = anime['listUrl']
+
+        if bestSrc != SRC_NONE: # 有找到可以看的片源點
+            fetchAnime = deepcopy(anime)
+            fetchAnime['watchUrl'] = bestWatchUrl
+            fetchAnime['volume'] = volume
+            return fetchAnime
+
+    return anime # 沒有更新或沒找到可看的片源點，返回原本的anime
 
 
 def check(anime, animes, comics):
