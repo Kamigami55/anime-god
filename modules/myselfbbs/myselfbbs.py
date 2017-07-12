@@ -95,12 +95,17 @@ def fetch(anime):
     res.raise_for_status()
     soup = bs4.BeautifulSoup(res.text, 'html.parser')
     volumeElems = soup.select('.main_list > li')
-    volumeElem = soup.select('.main_list > li:nth-of-type(%s)' % len(volumeElems))[0]
+    try:
+        volumeElem = soup.select('.main_list > li:nth-of-type(%s)' % len(volumeElems))[0]
+    except ValueError:
+        print('Something wrong when fetch myselfbbs anime %s, 可能是即將上映' % anime['name'])
+        return anime
     try:
         volume = int(re.search('\d+', volumeElem.select('a')[0].getText()).group(0))
     except AttributeError:
-        print('Something wrong when fetch myselfbbs anime %s' % anime['name'])
-        volume = 0
+        print('Something wrong when fetch myselfbbs anime %s, 可能最後一集集數有異' % anime['name'])
+        return anime
+    
     if volume > anime['volume']:
         # 篩選最好的片源點
         sourceElems = volumeElem.select('ul a')
