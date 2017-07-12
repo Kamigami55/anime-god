@@ -1,11 +1,16 @@
 import sqlite3, os
 
-DB = os.path.join(os.path.dirname(__file__), 'data.db')
+#DB = os.path.join(os.path.dirname(__file__), 'data.db')
+DB = os.path.join(os.path.dirname(__file__), '..', '..', 'anigod', 'db.sqlite3')
+#ANIME_TABLE_NAME = 'ANIME'
+#COMIC_TABLE_NAME = 'COMIC'
+ANIME_TABLE_NAME = 'SUBS_ANIME'
+COMIC_TABLE_NAME = 'SUBS_COMIC'
 
 
 def loadAnimes():
     conn = sqlite3.connect(DB)
-    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM ANIME')
+    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM %s' % ANIME_TABLE_NAME)
     animes = []
     for row in cursor:
         id = row[0]
@@ -36,7 +41,7 @@ def loadAnimes():
 
 def loadComics():
     conn = sqlite3.connect(DB)
-    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM COMIC')
+    cursor = conn.execute('SELECT ID, NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, SUBSCRIBE, ENDED FROM %s' % COMIC_TABLE_NAME)
     comics = []
     for row in cursor:
         id = row[0]

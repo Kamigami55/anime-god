@@ -106,3 +106,4 @@ image.jpg
 .emails
 images/
 data.db
+*.sqlite3
