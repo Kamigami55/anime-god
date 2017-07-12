@@ -85,7 +85,7 @@ def fetch(fetchName):
 
 
 def check(anime, animes, comics):
-    print('Check [巴哈]%s...' % anime['name'])
+    print('Check [巴哈]%s[%d]...' % (anime['name'], anime['volume']))
     fetchAnime = fetch(anime['name'])
     if fetchAnime['volume'] > anime['volume']:
         anime['volume'] = fetchAnime['volume']

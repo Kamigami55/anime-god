@@ -17,6 +17,7 @@
 
 # my own modules
 from modules.anigamer import anigamer
+from modules.myselfbbs import myselfbbs
 from modules.db.load import loadAnimes, loadComics
 
 
@@ -26,4 +27,7 @@ comics = loadComics()
 for anime in animes:
     if anime['site'] == 'anigamer':
         anigamer.check(anime, animes, comics)
+    elif anime['site'] == 'myselfbbs':
+        myselfbbs.check(anime, animes, comics)
+
 

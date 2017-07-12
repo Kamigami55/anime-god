@@ -1,5 +1,6 @@
 import sqlite3, os
 from ..anigamer import anigamer
+from ..myselfbbs import myselfbbs
 
 DB = os.path.join(os.path.dirname(__file__), 'data.db')
 
@@ -47,7 +48,23 @@ def importAnigamer():
     print('Succesfully import %d animes from AniGamer' % len(animes))
 
 
+def importMyselfbbs():
+    animes = myselfbbs.fetchAll()
+    conn = sqlite3.connect(DB)
+
+    for anime in animes:
+        conn.execute('''INSERT INTO ANIME
+        (NAME, VOLUME, SITE, LIST_URL, WATCH_URL, IMG_URL, IMG_SRC, ENDED) VALUES
+        ('%s', %d, '%s', '%s', '%s', '%s', '%s', %d)
+        ''' % (anime['name'], anime['volume'], 'myselfbbs', anime['listUrl'], anime['watchUrl'], anime['imageUrl'], anime['imageSrc'], 0))
+
+    conn.commit()
+    conn.close()
+    print('Succesfully import %d animes from MyselfBBS' % len(animes))
+
+
 def importData():
     importAnigamer()
+    importMyselfbbs()
     print('Succesfully import all data')
 
