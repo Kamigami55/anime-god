@@ -9,7 +9,6 @@ name = "pypi"
 requests = "*"
 "bs4" = "*"
 python-dotenv = "*"
-dotenv = "*"
 
 [requires]
 python_version = "3.5"
