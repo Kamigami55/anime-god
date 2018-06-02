@@ -38,3 +38,12 @@ class DMBase:
                                     self.dmType,
                                     self.name,
                                     self.episode)
+
+    def printDetail(self):
+        print("Name: %s" % self.name)
+        print("Type: %s" % self.dmType.value)
+        print("Site: %s" % self.site.value)
+        print("URL: %s" % self.url)
+        print("Episode: %s" % self.episode)
+        print("Status: %s" % self.status.value)
+

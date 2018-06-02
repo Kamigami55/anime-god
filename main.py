@@ -64,9 +64,9 @@ def performCheck(DMs):
 def updateFile(filePath, content):
     # Update episode numbers to ./storage.json
 
-    jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=4)
-    jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
-    jsonpickle.set_encoder_options('demjson', sort_keys=True, indent=4)
+    jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=4, ensure_ascii=False)
+    jsonpickle.set_encoder_options('json', sort_keys=True, indent=4, ensure_ascii=False)
+    jsonpickle.set_encoder_options('demjson', sort_keys=True, indent=4, ensure_ascii=False)
 
     fileContent = jsonpickle.encode(content)
     # fileContent = json.dumps(animes, indent=4, ensure_ascii=False)
