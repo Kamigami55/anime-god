@@ -1,8 +1,8 @@
 # coding: utf8
 
-from .DMBase import DMBase, StatusType, DMType, SiteType
-from ..crawler.cartoonmad import checkCartoonMad
-from ..gmail.mailClient import MailClient
+from .DMBase import DMBase, DMType, SiteType
+from ..crawler.cartoonmad import CartoonMadCrawler
+# from ..gmail.mailClient import MailClient
 
 
 class Manga(DMBase):
@@ -15,8 +15,9 @@ class Manga(DMBase):
         result = False
 
         if self.site == SiteType.CARTOONMAD:
-            result = checkCartoonMad(self)
-
+            crawler = CartoonMadCrawler()
+            result = crawler.check(self)
+        # True / False
         return result
 
     def sendMail(self, mailClient):

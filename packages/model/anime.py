@@ -1,8 +1,8 @@
 # coding: utf8
 
-from .DMBase import DMBase, StatusType, DMType, SiteType
-from ..crawler.myselfbbs import checkMyselfBBS
-from ..gmail.mailClient import MailClient
+from .DMBase import DMBase, DMType, SiteType
+from ..crawler.myselfbbs import MyselfBBSCrawler
+# from ..gmail.mailClient import MailClient
 
 
 class Anime(DMBase):
@@ -15,8 +15,9 @@ class Anime(DMBase):
         result = False
 
         if self.site == SiteType.MYSELFBBS:
-            result = checkMyselfBBS(self)
-
+            crawler = MyselfBBSCrawler()
+            result = crawler.check(self)
+        # True / False
         return result
 
     def sendMail(self, mailClient):

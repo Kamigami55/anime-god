@@ -5,37 +5,44 @@ import requests
 import bs4
 import re
 
+class CartoonMadCrawler():
 
-def checkCartoonMad(manga):
-    # Check comics on CartoonMad
+    def downloadPage(self, url):
+        # Download page
+        # logging.info('Checking [CartoonMad] ' + title + '[' + str(episode) + '] : ' + url)
+        res = requests.get(url)
+        res.raise_for_status()
+        self.soup = bs4.BeautifulSoup(res.text, 'html.parser')
 
-    # Download page
-    # logging.info('Checking [CartoonMad] ' + title + '[' + str(episode) + '] : ' + url)
-    res = requests.get(manga.url)
-    res.raise_for_status()
-    soup = bs4.BeautifulSoup(res.text, 'html.parser')
+    def parseEpisode(self):
+        # Get episode number from page
+        # Only works for serializing comics
+        # TODO: Fix it
+        episodeElemImg = self.soup.find("img", src='/image/chap1.gif')
+        if episodeElemImg is None:
+            logging.warning('Could not find episode element img')
+            return
+        rx_blanks = re.compile(r"\s+")
+        episodeNumText = rx_blanks.sub("", episodeElemImg.parent.contents[2].getText())
+        episodeNumMatch = re.search('~(\d+)', episodeNumText)
+        if episodeNumMatch is None:
+            logging.warning('Could not find episodeNumText')
+            return
+        episodeNum = int(episodeNumMatch.group(1))
+        logging.info('Found episode ' + str(episodeNum))
+        self.episode = episodeNum
+        return self.episode
 
-    # Get episode number from page
-    # Only works for serializing comics
-    # TODO: Fix it
-    episodeElemImg = soup.find("img", src='/image/chap1.gif')
-    if episodeElemImg is None:
-        logging.warning('Could not find episode element img')
-        return
-    rx_blanks = re.compile(r"\s+")
-    episodeNumText = rx_blanks.sub("", episodeElemImg.parent.contents[2].getText())
-    episodeNumMatch = re.search('~(\d+)', episodeNumText)
-    if episodeNumMatch is None:
-        logging.warning('Could not find episodeNumText')
-        return
-    episodeNum = int(episodeNumMatch.group(1))
-    logging.info('Found episode ' + str(episodeNum))
+    def check(self, manga):
+        # Check comics on CartoonMad
 
-    # Check whether the anime has been updated.
-    if episodeNum > manga.episode:
-        print('[漫畫] ' + manga.name + ' 更新了第 ' + str(episodeNum) + ' 集了！')
-        # Update episode num
-        manga.episode = episodeNum
-        return True
+        self.downloadPage(manga.url)
+        self.parseEpisode()
 
-    return False
+        # Check whether the anime has been updated.
+        if self.episode > manga.episode:
+            print('[漫畫] ' + manga.name + ' 更新了第 ' + str(self.episode) + ' 集了！')
+            # Update episode num
+            manga.episode = self.episode
+            return True
+        return False
