@@ -69,6 +69,15 @@ def main():
                 continue
             url = result.group(0)
 
+            hasExist = False
+            for DM in DMs:
+                if url == DM.url:
+                    print("%s 已經在資料庫中了" % DM.name)
+                    hasExist = True
+                    break
+            if hasExist:
+                continue
+
             DM = generateDMModel(url)
             if DM is None:
                 print("Currently not support this website")
@@ -80,6 +89,7 @@ def main():
             DMs.append(DM)
 
     except KeyboardInterrupt:
+        print("Exit with key interrupt")
         pass
 
     print("Done!")
