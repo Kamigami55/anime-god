@@ -2,7 +2,6 @@
 
 from .DMBase import DMBase, DMType, SiteType
 from ..crawler.cartoonmad import CartoonMadCrawler
-# from ..gmail.mailClient import MailClient
 
 
 class Manga(DMBase):
@@ -11,14 +10,22 @@ class Manga(DMBase):
         super().__init__()
         self.dmType = DMType.MANGA
 
-    def check(self):
-        result = False
+    def checkUpdate(self):
+        crawler = None
 
         if self.site == SiteType.CARTOONMAD:
             crawler = CartoonMadCrawler()
-            result = crawler.check(self)
-        # True / False
-        return result
+
+        crawler.downloadPage(self.url)
+        episode = crawler.parseEpisode()
+
+        if episode > self.episode:
+            # This manga has been updated
+            self.episode = episode
+            print('[漫畫] ' + self.name + ' 更新了第 ' + str(self.episode) + ' 集了！')
+            return True
+        else:
+            return False
 
     def sendMail(self, mailClient):
         # Email me

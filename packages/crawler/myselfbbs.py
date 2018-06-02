@@ -31,15 +31,18 @@ class MyselfBBSCrawler():
         self.episode = episodeNum
         return self.episode
 
-    def check(self, anime):
-        # Check animes on Myself-bbs
-        self.downloadPage(anime.url)
-        self.parseEpisode()
-        # Check whether the anime has been updated.
-        if self.episode > anime.episode:
-            print('[動畫] ' + anime.name + ' 更新了第 ' + str(self.episode) + ' 集了！')
-            # Update episode num
-            anime.episode = self.episode
-            return True
-
-        return False
+    def parseName(self):
+        # Get episode number from page
+        episodeElems = self.soup.select('.z a:nth-of-type(5)')
+        if episodeElems == []:
+            logging.warning('Could not find episode elements')
+            return
+        logging.info(episodeElems[0].getText())
+        # Parse name
+        nameElems = re.search('^(.+)【', episodeElems[0].getText())
+        if nameElems is None:
+            logging.warning('Could not find nameElems')
+            return
+        self.name = int(nameElems.group(1))
+        logging.info('Found name ' + str(self.name))
+        return self.name

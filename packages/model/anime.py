@@ -2,7 +2,6 @@
 
 from .DMBase import DMBase, DMType, SiteType
 from ..crawler.myselfbbs import MyselfBBSCrawler
-# from ..gmail.mailClient import MailClient
 
 
 class Anime(DMBase):
@@ -11,14 +10,22 @@ class Anime(DMBase):
         super().__init__()
         self.dmType = DMType.ANIME
 
-    def check(self):
-        result = False
+    def checkUpdate(self):
+        crawler = None
 
         if self.site == SiteType.MYSELFBBS:
             crawler = MyselfBBSCrawler()
-            result = crawler.check(self)
-        # True / False
-        return result
+
+        crawler.downloadPage(self.url)
+        episode = crawler.parseEpisode()
+
+        if episode > self.episode:
+            # This anime has been updated
+            self.episode = episode
+            print('[動畫] ' + self.name + ' 更新了第 ' + str(self.episode) + ' 集了！')
+            return True
+        else:
+            return False
 
     def sendMail(self, mailClient):
         # Email me

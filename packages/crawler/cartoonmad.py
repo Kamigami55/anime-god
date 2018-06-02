@@ -32,17 +32,3 @@ class CartoonMadCrawler():
         logging.info('Found episode ' + str(episodeNum))
         self.episode = episodeNum
         return self.episode
-
-    def check(self, manga):
-        # Check comics on CartoonMad
-
-        self.downloadPage(manga.url)
-        self.parseEpisode()
-
-        # Check whether the anime has been updated.
-        if self.episode > manga.episode:
-            print('[漫畫] ' + manga.name + ' 更新了第 ' + str(self.episode) + ' 集了！')
-            # Update episode num
-            manga.episode = self.episode
-            return True
-        return False

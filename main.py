@@ -25,9 +25,6 @@ import logging
 import jsonpickle
 from os import path
 from packages.gmail.mailClient import MailClient
-from packages.model.anime import Anime
-from packages.model.manga import Manga
-from packages.model.DMBase import DMType, StatusType, SiteType
 
 
 # Set logging config
@@ -35,61 +32,43 @@ logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 # Disable logging
 logging.disable(logging.CRITICAL)
 
-# A flag whether there is an anime update during this one-time check
-hasDMUpdated = False
-DMs = None
-filePath = path.join(path.dirname(__file__), 'storage.json')
 mailClient = MailClient()
 
 
-def loadDMs():
-    global filePath
-    global DMs
+def loadFile(filePath):
     # Load list of my favorite animes from ./storage.json
     file = open(filePath, 'r')
     fileContent = file.read()
     file.close()
-    DMs = jsonpickle.decode(fileContent)
-    # animes = json.loads(fileContent)
+    content = jsonpickle.decode(fileContent)
+    return content
 
 
-def performCheck():
-    global hasDMUpdated
-    global DMs
+def performCheck(DMs):
+    hasDMUpdated = False
     global mailClient
 
     for i in range(len(DMs)):
         DM = DMs[i]
-        if DM.check():
-            # this DM has updated
+        if DM.checkUpdate():
+            # this DM has been updated
+
             # send email
             DM.sendMail(mailClient)
             # set flag to true
             hasDMUpdated = True
 
-    # Loop through each anime in my animes list
-    # for i in range(len(animes['animes'])):
-        # anime = animes['animes'][i]
-        # if anime['site'] == 'myself-bbs':
-            # checkMyselfBBS(anime, i)
-
-    # # Loop through each comic in my comics list
-    # for i in range(len(animes['comics'])):
-        # comic = animes['comics'][i]
-        # if comic['site'] == 'cartoonmad':
-            # checkCartoonMad(comic, i)
+    return hasDMUpdated
 
 
-def updateFile():
+def updateFile(filePath, content):
     # Update episode numbers to ./storage.json
-    global filePath
-    global DMs
 
     jsonpickle.set_encoder_options('simplejson', sort_keys=True, indent=4)
     jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
     jsonpickle.set_encoder_options('demjson', sort_keys=True, indent=4)
 
-    fileContent = jsonpickle.encode(DMs)
+    fileContent = jsonpickle.encode(content)
     # fileContent = json.dumps(animes, indent=4, ensure_ascii=False)
     file = open(filePath, 'w')
     file.write(fileContent)
@@ -97,10 +76,16 @@ def updateFile():
 
 
 def main():
-    loadDMs()
-    performCheck()
+
+    DMs = None
+    filePath = path.join(path.dirname(__file__), 'storage.json')
+
+    DMs = loadFile(filePath)
+
+    hasDMUpdated = performCheck(DMs)
+
     if hasDMUpdated:
-        updateFile()
+        updateFile(filePath, DMs)
         print('File updated')
     else:
         print('新番尚未更新哦')
