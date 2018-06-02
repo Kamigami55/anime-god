@@ -27,7 +27,7 @@ class MyselfBBSCrawler():
             logging.warning('Could not find episode elements')
             return
         logging.info(episodeElems[0].getText())
-        episodeNumText = re.search('【.*(\d+)', episodeElems[0].getText())
+        episodeNumText = re.search('【\D*(\d+)', episodeElems[0].getText())
         if episodeNumText is None:
             logging.warning('Could not find episodeNumText')
             return
