@@ -1,25 +1,11 @@
 # coding: utf8
 
 import logging
-import requests
-import bs4
 import re
+from .crawlerBase import CrawlerBase
 
 
-class CartoonMadCrawler():
-
-    def __init__(self, url=None):
-        if url is not None:
-            self.downloadPage(url)
-
-    def downloadPage(self, url):
-        # Download page
-        # logging.info('Checking [CartoonMad] ' + title + '[' + str(episode) + '] : ' + url)
-        res = requests.get(url)
-        res.raise_for_status()
-        if "cartoonmad.com" in url:
-            res.encoding = 'big5'
-        self.soup = bs4.BeautifulSoup(res.text, 'html.parser')
+class CartoonMadCrawler(CrawlerBase):
 
     def parseEpisode(self):
         # Get episode number from page

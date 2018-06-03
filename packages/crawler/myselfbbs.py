@@ -1,24 +1,11 @@
 # coding: utf8
 
 import logging
-import requests
-import bs4
 import re
+from .crawlerBase import CrawlerBase
 
 
-class MyselfBBSCrawler():
-
-    def __init__(self, url=None):
-        if url is not None:
-            self.downloadPage(url)
-
-    def downloadPage(self, url):
-        # Download page
-        # logging.info('Checking [Myself-bbs] ' + title + '[' + str(episode) + '] : ' + url)
-        res = requests.get(url)
-        res.raise_for_status()
-        self.url = url
-        self.soup = bs4.BeautifulSoup(res.text, 'html.parser')
+class MyselfBBSCrawler(CrawlerBase):
 
     def parseEpisode(self):
         # Get episode number from page
