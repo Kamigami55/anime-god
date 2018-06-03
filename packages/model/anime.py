@@ -2,6 +2,7 @@
 
 from .DMBase import DMBase, DMType, SiteType
 from ..crawler.myselfbbs import MyselfBBSCrawler
+from ..crawler.bilibili import BilibiliCrawler
 
 
 class Anime(DMBase):
@@ -15,6 +16,8 @@ class Anime(DMBase):
 
         if self.site == SiteType.MYSELFBBS:
             crawler = MyselfBBSCrawler()
+        elif self.site == SiteType.BILIBILI:
+            crawler = BilibiliCrawler()
 
         crawler.downloadPage(self.url)
         episode = crawler.parseEpisode()

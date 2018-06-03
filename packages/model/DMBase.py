@@ -19,6 +19,7 @@ class SiteType(Enum):
     UNKNOWN = "unknown"
     # Anime sites
     MYSELFBBS = "myself-bbs"
+    BILIBILI = "bilibili"
     # Manga sites
     CARTOONMAD = "cartoon-mad"
 
@@ -46,4 +47,3 @@ class DMBase:
         print("URL: %s" % self.url)
         print("Episode: %s" % self.episode)
         print("Status: %s" % self.status.value)
-

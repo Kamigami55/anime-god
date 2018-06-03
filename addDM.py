@@ -9,6 +9,7 @@ from packages.model.manga import Manga
 from packages.model.DMBase import SiteType, StatusType
 from packages.crawler.myselfbbs import MyselfBBSCrawler
 from packages.crawler.cartoonmad import CartoonMadCrawler
+from packages.crawler.bilibili import BilibiliCrawler
 
 
 def generateDMModel(url):
@@ -29,7 +30,14 @@ def generateDMModel(url):
         DM.name = crawler.parseName()
         DM.episode = crawler.parseEpisode()
         DM.status = StatusType.SERIALING
-
+    elif "bilibili.com" in url:
+        DM = Anime()
+        DM.url = url
+        DM.site = SiteType.BILIBILI
+        crawler = BilibiliCrawler(url)
+        DM.name = crawler.parseName()
+        DM.episode = crawler.parseEpisode()
+        DM.status = StatusType.SERIALING
     return DM
 
 
